@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <title>URL - Shortner</title>
+    <style>
+      body {
+        background-color: aliceblue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md m-auto mt-6">
+      <h3 class="text-2xl font-semibold text-center text-blue-700 mb-6">
+        🔗 URL Shortener
+      </h3>
+
+      <label for="url" class="block text-gray-700 font-medium mb-2">
+        Enter Your URL:
+      </label>
+      <input
+        type="text"
+        id="url"
+        placeholder="https://example.com"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4"
+      />
+
+      <button
+        onclick="shortenURL()"
+        class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all duration-200"
+      >
+        Shorten URL
+      </button>
+
+      <div id="result" class="mt-6 text-center text-green-600 font-semibold">
+        Your short URL will appear here!
+      </div>
+    </div>
+
+    <script>
+      function shortenURL() {
+        const url = document.getElementById("url").value;
+        const result = document.getElementById("result");
+        if (url.trim() === "") {
+          result.textContent = "Please enter a valid URL!";
+          result.classList.remove("text-green-600");
+          result.classList.add("text-red-600");
+          setTimeout(() => {
+            result.textContent = "Your short URL will appear here!";
+            result.classList.remove("text-red-600");
+            result.classList.add("text-green-600");
+          }, 2000);
+          return;
+        }
+
+        fetch("/url", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ url: url }),
+        })
+          .then((responce) => responce.json())
+          .then((json) => {
+            console.log(json);
+            const shortUrl = "http://localhost:8001/r/" + json.id;
+            result.innerHTML = `
+              <div class="flex items-center justify-between bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 shadow-sm hover:shadow-md transition max-w-xl mx-auto">
+                <a href="${shortUrl}" target="_blank" class="text-blue-600 hover:text-blue-800 truncate w-full text-left no-underline">
+                  ${shortUrl}
+                </a>
+                <div class="ml-3 relative group">
+                  <img src="/copy.svg" alt="Copy" onclick="copyToClipboard('${shortUrl}')" class="w-6 h-6 cursor-pointer hover:opacity-80" />
+                  <span id="copy-tooltip" class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:block bg-gray-700 text-white text-xs rounded px-2 py-1 transition-all duration-200">
+                    Copy
+                  </span>
+                </div>
+              </div>
+            `;
+          });
+      }
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          const tooltip = document.getElementById("copy-tooltip");
+          tooltip.innerText = "Copied!";
+          tooltip.classList.remove("hidden");
+
+          setTimeout(() => {
+            tooltip.innerText = "Copy";
+            tooltip.classList.add("hidden");
+          }, 1500);
+        });
+      }
+    </script>
+  </body>
+</html>

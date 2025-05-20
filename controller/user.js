@@ -10,7 +10,7 @@ async function handleUserSignUp(req, res) {
         email,
         password
     })
-    res.render('login' , {user})
+    res.redirect('login')
 } 
 
 async function handleUserLogIn(req, res) {
@@ -28,8 +28,7 @@ async function handleUserLogIn(req, res) {
     const sessionId = uuidv4()
     setUser(sessionId, user)
     res.cookie('uid', sessionId)
-    return res.render('index' , {user})
-
+    return res.redirect('/');
 
 } 
 

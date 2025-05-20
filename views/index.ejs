@@ -108,6 +108,10 @@
           return;
         }
 
+        if(!document.cookie.includes('uid=')){
+          console.log(document.cookie.uid)
+          window.location.href = '/login'
+        }
         fetch("/url", {
           method: "POST",
           headers: {
@@ -119,7 +123,6 @@
           .then((json) => {
             console.log(json);
             displayURL(json);
-            renderTable(json.urls);
           });
       }
 
@@ -142,57 +145,7 @@
 
       function renderTable(urls) {
         const tbody = document.getElementById("tableBody");
-        tbody.innerHTML = ""; // Clear previous content
-
-        urls.forEach((url, index) => {
-          const row = `
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-2 border-b">${index + 1}</td>
-              <td class="px-4 py-2 border-b break-all">
-                <a href="${
-                  url.redirectUrl
-                }" class="text-blue-600 hover:underline" target="_blank">${
-            url.redirectUrl
-          }</a>
-              </td>
-              <td class="px-4 py-2 border-b"><a href="http://localhost:8001/r/${
-                url.shortId
-              }" class="text-blue-600 hover:underline" target="_blank">http://localhost:8001/r${
-            url.shortId
-          }</a></td>
-              <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
-            </tr>
-          `;
-          tbody.insertAdjacentHTML("beforeend", row);
-        });
-      }
-      function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-          const tooltip = document.getElementById("copy-tooltip");
-          tooltip.innerText = "Copied!";
-          tooltip.classList.remove("hidden");
-
-          setTimeout(() => {
-            tooltip.innerText = "Copy";
-            tooltip.classList.add("hidden");
-          }, 1500);
-        });
-      }
-
-      const analyticsBtn = document.getElementById("analyticsBtn");
-      const analyticsTable = document.getElementById("analyticsTable");
-      const arrowToggle = document.getElementById("arrowToggle");
-      const tableBody = document.getElementById("tableBody");
-
-      let tableVisible = false;
-
-      // Fetch and render table data when Analytics is clicked
-      analyticsBtn.addEventListener("click", () => {
-        fetch("/url/analytics")
-          .then((res) => res.json())
-          .then((data) => {
-            const urls = data.urls;
-            tableBody.innerHTML = ""; // Clear previous rows
+        tableBody.innerHTML = ""; // Clear previous rows
             urls.forEach((url, i) => {
               tableBody.innerHTML += `
                 <tr class="hover:bg-gray-50">
@@ -214,6 +167,33 @@
                   <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
                 </tr>`;
             });
+      }
+      function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+          const tooltip = document.getElementById("copy-tooltip");
+          tooltip.innerText = "Copied!";
+          tooltip.classList.remove("hidden");
+
+          setTimeout(() => {
+            tooltip.innerText = "Copy";
+            tooltip.classList.add("hidden");
+          }, 1500);
+        });
+      }
+
+      const analyticsBtn = document.getElementById("analyticsBtn");
+      const analyticsTable = document.getElementById("analyticsTable");
+      const arrowToggle = document.getElementById("arrowToggle");
+
+      let tableVisible = false;
+
+      // Fetch and render table data when Analytics is clicked
+      analyticsBtn.addEventListener("click", () => {
+        fetch("/url/analytics")
+          .then((res) => res.json())
+          .then((data) => {
+            const urls = data.urls;
+            renderTable(urls)
 
             // Show the table if hidden
             if (!tableVisible) {

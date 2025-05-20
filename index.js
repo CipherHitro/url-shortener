@@ -4,7 +4,7 @@ const userRoute = require('./routes/user')
 const { connectMongoDb } = require("./connections");
 const URL = require('./models/url.js')
 const cookieParser = require('cookie-parser')
-const {restrictToLoggedinUser} = require('./middlewares/auth.js')
+const {restrictToLoggedinUser, checkAuth} = require('./middlewares/auth.js')
 
 
 const app = express();
@@ -26,7 +26,7 @@ connectMongoDb("mongodb://localhost:27017/short-url")
   .catch((err) => console.log(err)
 );
 
-app.get('/', (req, res) => {
+app.get('/', checkAuth, (req, res) => {
   res.render('index');
 });
 

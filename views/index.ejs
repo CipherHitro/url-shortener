@@ -8,14 +8,16 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><text y='1em' font-size='90'>🔗</text></svg>">
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><text y='1em' font-size='90'>🔗</text></svg>"
+    />
 
     <title>URL - Shortner</title>
     <style>
       body {
         background-color: aliceblue;
       }
-      
     </style>
   </head>
   <body>
@@ -146,7 +148,6 @@
           const row = `
             <tr class="hover:bg-gray-50">
               <td class="px-4 py-2 border-b">${index + 1}</td>
-              <td class="px-4 py-2 border-b">${url.shortId}</td>
               <td class="px-4 py-2 border-b break-all">
                 <a href="${
                   url.redirectUrl
@@ -154,6 +155,11 @@
             url.redirectUrl
           }</a>
               </td>
+              <td class="px-4 py-2 border-b"><a href="http://localhost:8001/r/${
+                url.shortId
+              }" class="text-blue-600 hover:underline" target="_blank">http://localhost:8001/r${
+            url.shortId
+          }</a></td>
               <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
             </tr>
           `;
@@ -199,7 +205,11 @@
               }</a>
                   </td>
                   <td class="px-4 py-2 border-b">
-                    <a href="http://localhost:8001/r/${url.shortId}" class="text-blue-600 hover:underline" target="_blank">http://localhost:8001/r/${url.shortId}</a>  
+                    <a href="http://localhost:8001/r/${
+                      url.shortId
+                    }" class="text-blue-600 hover:underline" target="_blank">http://localhost:8001/r/${
+                url.shortId
+              }</a>  
                   </td>
                   <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
                 </tr>`;

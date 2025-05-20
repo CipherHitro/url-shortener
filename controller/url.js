@@ -24,8 +24,7 @@ async function handleGenerateNewShortUrl(req, res) {
   }
 }
 async function handleGetAnalytics(req, res) {
-  const result = await URL.find({});
-  console.log(result);
+  const result = await URL.find({})
   return res.json({urls : result});
 }
 

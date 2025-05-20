@@ -10,6 +10,7 @@ Paste a long URL and get a short version that redirects you instantly.
 - ✅ Shortens any valid URL
 - 🔁 Redirects short URLs to original links
 - 📋 Copy to clipboard feature
+- 📊 Show Analytics
 - 🎨 Beautiful UI using EJS and CSS
 - ⚡ Fast and lightweight
 

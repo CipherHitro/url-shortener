@@ -10,7 +10,7 @@ async function handleUserSignUp(req, res) {
         email,
         password
     })
-    res.redirect('login')
+    res.render('login')
 } 
 
 async function handleUserLogIn(req, res) {
@@ -20,7 +20,6 @@ async function handleUserLogIn(req, res) {
     // res.render('home' , {user})
     // console.log(user)
     if(!user){
-
         return res.render('login', {error : "Invalid username or password"})
         
     }

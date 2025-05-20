@@ -7,31 +7,28 @@ async function handleGenerateNewShortUrl(req, res) {
   if (!body.url) {
     return res.status(400).json({ message: "URL is required" });
   }
-  const result = await URL.findOne({ redirectUrl : body.url });
-  if(result){
+  const result = await URL.findOne({ redirectUrl: body.url });
+  let urls = await URL.find({});
 
-    return res.status(200).json({ id: result.shortId });
-  }
-  else{
+  if (result) {
+    return res.status(200).json({ id: result.shortId ,urls});
+  } else {
     await URL.create({
-        shortId: shortId,
-        redirectUrl: body.url,
-        visitHistory: [],
-      });
-      return res.status(201).json({ id: shortId });
-    }
+      shortId: shortId,
+      redirectUrl: body.url,
+      visitHistory: [],
+    });
+    let urls = await URL.find({});
+
+    return res.status(201).json({ id: shortId ,urls});
+  }
 }
 async function handleGetAnalytics(req, res) {
-  const shortid = req.params.shortid;
-  console.log(shortid)
-
-  const result = await URL.findOne({ shortId : shortid });
-    console.log(result)
-  return res.json({
-    totalClicks: result.visitHistory.length,
-    visitHistory: result.visitHistory,
-  });
+  const result = await URL.find({});
+  console.log(result);
+  return res.json({urls : result});
 }
+
 module.exports = {
   handleGenerateNewShortUrl,
   handleGetAnalytics,

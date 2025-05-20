@@ -8,11 +8,14 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><text y='1em' font-size='90'>🔗</text></svg>">
+
     <title>URL - Shortner</title>
     <style>
       body {
         background-color: aliceblue;
       }
+      
     </style>
   </head>
   <body>
@@ -42,6 +45,50 @@
         Your short URL will appear here!
       </div>
     </div>
+    <div class="w-4/5 mx-auto mt-8 flex justify-between items-center">
+      <button
+        id="analyticsBtn"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition"
+      >
+        Analytics
+      </button>
+      <svg
+        id="arrowToggle"
+        class="w-8 h-8 text-blue-600 cursor-pointer hover:bg-blue-100 rounded-full transition duration-300 p-1"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    </div>
+
+    <!-- Table Container -->
+    <div
+      id="analyticsTable"
+      class="w-4/5 mx-auto mt-4 mb-2 hidden transition-all duration-500 ease-in-out"
+    >
+      <table
+        class="table-auto w-full border border-gray-300 rounded-md shadow-md overflow-hidden"
+      >
+        <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+          <tr class="font-semibold text-center">
+            <th class="px-4 py-3 border-b">Sr No.</th>
+            <th class="px-4 py-3 border-b">Redirect URL</th>
+            <th class="px-4 py-3 border-b">Short URL</th>
+            <th class="px-4 py-3 border-b">Total Clicks</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody" class="text-gray-800 text-sm text-left">
+          <!-- Dynamic rows will be inserted here -->
+        </tbody>
+      </table>
+    </div>
 
     <script>
       function shortenURL() {
@@ -69,7 +116,8 @@
           .then((responce) => responce.json())
           .then((json) => {
             console.log(json);
-            displayURL(json)
+            displayURL(json);
+            renderTable(json.urls);
           });
       }
 
@@ -89,6 +137,29 @@
           </div>
         `;
       }
+
+      function renderTable(urls) {
+        const tbody = document.getElementById("tableBody");
+        tbody.innerHTML = ""; // Clear previous content
+
+        urls.forEach((url, index) => {
+          const row = `
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-2 border-b">${index + 1}</td>
+              <td class="px-4 py-2 border-b">${url.shortId}</td>
+              <td class="px-4 py-2 border-b break-all">
+                <a href="${
+                  url.redirectUrl
+                }" class="text-blue-600 hover:underline" target="_blank">${
+            url.redirectUrl
+          }</a>
+              </td>
+              <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
+            </tr>
+          `;
+          tbody.insertAdjacentHTML("beforeend", row);
+        });
+      }
       function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
           const tooltip = document.getElementById("copy-tooltip");
@@ -101,6 +172,57 @@
           }, 1500);
         });
       }
+
+      const analyticsBtn = document.getElementById("analyticsBtn");
+      const analyticsTable = document.getElementById("analyticsTable");
+      const arrowToggle = document.getElementById("arrowToggle");
+      const tableBody = document.getElementById("tableBody");
+
+      let tableVisible = false;
+
+      // Fetch and render table data when Analytics is clicked
+      analyticsBtn.addEventListener("click", () => {
+        fetch("/url/analytics")
+          .then((res) => res.json())
+          .then((data) => {
+            const urls = data.urls;
+            tableBody.innerHTML = ""; // Clear previous rows
+            urls.forEach((url, i) => {
+              tableBody.innerHTML += `
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-2 border-b">${i + 1}</td>
+                  <td class="px-4 py-2 border-b break-all">
+                    <a href="${
+                      url.redirectUrl
+                    }" class="text-blue-600 hover:underline" target="_blank">${
+                url.redirectUrl
+              }</a>
+                  </td>
+                  <td class="px-4 py-2 border-b">
+                    <a href="http://localhost:8001/r/${url.shortId}" class="text-blue-600 hover:underline" target="_blank">http://localhost:8001/r/${url.shortId}</a>  
+                  </td>
+                  <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
+                </tr>`;
+            });
+
+            // Show the table if hidden
+            if (!tableVisible) {
+              analyticsTable.classList.remove("hidden");
+              arrowToggle.classList.add("rotate-180");
+              tableVisible = true;
+            }
+          })
+          .catch((err) => {
+            console.error("Error fetching analytics:", err);
+          });
+      });
+
+      // Toggle table visibility
+      arrowToggle.addEventListener("click", () => {
+        analyticsTable.classList.toggle("hidden");
+        arrowToggle.classList.toggle("rotate-180");
+        tableVisible = !tableVisible;
+      });
     </script>
   </body>
 </html>

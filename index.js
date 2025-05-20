@@ -24,8 +24,9 @@ connectMongoDb("mongodb://localhost:27017/short-url")
 app.use(express.json())
 app.use(express.static("public")); 
 
-app.get('/', (req, res) => {
-  res.render('index', {foo: 'FOO'});
+
+app.get('/', async (req, res) => {
+  res.render('index');
 });
 
 

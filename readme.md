@@ -40,12 +40,6 @@ node index.js
 ```bash
 nodemon index.js 
 ``` 
-### This is the Interface 
 
-![Demo Screenshot](./public/ss1.png)
-
-### Enter URL and hit Shortern URL button 
-
-![Demo Screenshot](./public/ss2.png)
 
 

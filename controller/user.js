@@ -25,7 +25,13 @@ async function handleUserLogIn(req, res) {
     }
     
     const token = setUser(user)
+    const isAdmin = getUser(token);
     res.cookie('uid', token)
+    console.log("admin : ", isAdmin)
+    if(isAdmin.roles == "ADMIN"){
+        return res.redirect('/url/admin');
+
+    }
     return res.redirect('/');
 
 } 

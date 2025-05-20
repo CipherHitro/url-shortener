@@ -22,9 +22,11 @@
   </head>
   <body>
     <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md m-auto mt-6">
-      <h3 class="text-2xl font-semibold text-center mb-2">Welcome <%= user.name  %></h3>
+      <h3 class="text-2xl font-semibold text-center mb-2">
+        Welcome <%= user.name %>
+      </h3>
       <h3 class="text-2xl font-semibold text-center text-blue-700 mb-6">
-        🔗 URL Shortener
+        🔗 URL Shortener 🔗
       </h3>
 
       <label for="url" class="block text-gray-700 font-medium mb-2">
@@ -79,7 +81,7 @@
       <table
         class="table-auto w-full border border-gray-300 rounded-md shadow-md overflow-hidden"
       >
-        <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
+        <thead class=" text-left bg-gray-100 text-gray-700 uppercase text-sm" id="tableHead">
           <tr class="font-semibold text-center">
             <th class="px-4 py-3 border-b">Sr No.</th>
             <th class="px-4 py-3 border-b">Redirect URL</th>
@@ -94,6 +96,9 @@
     </div>
 
     <script>
+      const isAdmin = window.location.pathname.includes("/admin");
+      const endpoint = isAdmin ? "/url/admin" : "/url";
+
       function shortenURL() {
         const url = document.getElementById("url").value;
         const result = document.getElementById("result");
@@ -109,11 +114,13 @@
           return;
         }
 
-        if(!document.cookie.includes('uid=')){
-          console.log(document.cookie.uid)
-          window.location.href = '/login'
+        if (!document.cookie.includes("uid=")) {
+          console.log(document.cookie.uid);
+          window.location.href = "/login";
         }
-        fetch("/url", {
+        console.log(endpoint);
+
+        fetch(endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -144,30 +151,49 @@
         `;
       }
 
-      function renderTable(urls) {
+      function renderTable(urls, name) {
         const tbody = document.getElementById("tableBody");
-        tableBody.innerHTML = ""; // Clear previous rows
-            urls.forEach((url, i) => {
-              tableBody.innerHTML += `
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-2 border-b">${i + 1}</td>
-                  <td class="px-4 py-2 border-b break-all">
-                    <a href="${
-                      url.redirectUrl
-                    }" class="text-blue-600 hover:underline" target="_blank">${
-                url.redirectUrl
-              }</a>
-                  </td>
-                  <td class="px-4 py-2 border-b">
-                    <a href="http://localhost:8001/r/${
-                      url.shortId
-                    }" class="text-blue-600 hover:underline" target="_blank">http://localhost:8001/r/${
-                url.shortId
-              }</a>  
-                  </td>
-                  <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
-                </tr>`;
-            });
+        tbody.innerHTML = ""; // Clear previous rows
+
+        const userMap = name
+        ? name.reduce((acc, user) => {
+            acc[user._id] = user.name;
+            return acc;
+          }, {})
+        : null;
+
+        urls.forEach((url, i) => {
+          const createdBy = userMap ? userMap[url.createdBy] || "Unknown" : null;
+
+          tbody.innerHTML += `
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-2 border-b">${i + 1}</td>
+              <td class="px-4 py-2 border-b break-all">
+                <a href="${url.redirectUrl}" class="text-blue-600 hover:underline" target="_blank">${url.redirectUrl}</a>
+              </td>
+              <td class="px-4 py-2 border-b break-all">
+                <a href="http://localhost:8001/r/${url.shortId}" class="text-blue-600 hover:underline" target="_blank">http://localhost:8001/r/${url.shortId}</a>
+              </td>
+              <td class="px-4 py-2 border-b">${url.visitHistory.length}</td>
+              ${
+                createdBy
+                  ? `<td class="px-4 py-2 border-b">${createdBy}</td>`
+                  : ""
+              }
+            </tr>
+          `;
+        });
+
+        const thead = document.getElementById("tableHead");
+        thead.innerHTML = `
+          <tr>
+            <th class="px-4 py-3 border-b">Sr No.</th>
+            <th class="px-4 py-3 border-b">Redirect URL</th>
+            <th class="px-4 py-3 border-b">Short URL</th>
+            <th class="px-4 py-3 border-b">Total Clicks</th>
+            ${name ? `<th class="px-4 py-3 border-b">Created By</th>` : ""}
+          </tr>
+        `;
       }
       function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
@@ -190,11 +216,13 @@
 
       // Fetch and render table data when Analytics is clicked
       analyticsBtn.addEventListener("click", () => {
-        fetch("/url/analytics")
+        fetch(endpoint + "/analytics")
           .then((res) => res.json())
           .then((data) => {
             const urls = data.urls;
-            renderTable(urls)
+            console.log(data.name);
+            console.log(data.urls);
+            renderTable(urls, data.name);
 
             // Show the table if hidden
             if (!tableVisible) {

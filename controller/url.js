@@ -29,7 +29,7 @@ async function handleGetAnalytics(req, res) {
     return res.redirect('/login');
   }
   const result = await URL.find({createdBy : req.user._id})
-  return res.json({urls : result});
+  return res.json({urls : result , name: null});
 }
 
 module.exports = {

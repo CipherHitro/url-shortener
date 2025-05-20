@@ -27,7 +27,8 @@ connectMongoDb("mongodb://localhost:27017/short-url")
 );
 
 app.get('/', checkAuth, (req, res) => {
-  res.render('index');
+  const user = req.user;
+  res.render('index' ,{user});
 });
 
 app.get("/signup", (req, res) => {

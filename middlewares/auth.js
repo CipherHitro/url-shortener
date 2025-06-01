@@ -33,6 +33,11 @@ async function checkForAuthentication(req, res, next) {
         return next();
     }
     const user = getUser(token)
+    if(!user) {
+        
+        req.user = {name:"Guest User"}
+        return next();
+    }
     req.user = user;
     next()
 }
